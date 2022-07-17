@@ -3,14 +3,15 @@ import {
  StyleSheet, View,
 } from "react-native";
 import Weather from "./weather/Weather";
+import Work from "./work/Work";
 
 
 
 export default function App() {
   return (
    <View style={styles.container}>
-      <Weather></Weather>
-      
+      {/* <Weather></Weather> */}
+      <Work></Work>
       <StatusBar style="light"></StatusBar>
    </View>
   );

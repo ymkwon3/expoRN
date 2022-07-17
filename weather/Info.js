@@ -16,7 +16,7 @@ const icons = {
 
 export default function Info({day, index}) {
   return (
-      <View style={styles.day} key={index}>
+      <View style={styles.day}>
         <Text style={styles.date}>
           {moment(moment.unix(day.dt).valueOf()).format("MM월 DD일")}
         </Text>

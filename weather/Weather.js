@@ -71,7 +71,7 @@ export default function Weather() {
           </View>
         ) : (
           days.map((day, index) => (
-            <Info day={day} index={index}></Info>
+            <Info day={day} key={index}></Info>
           ))
         )}
       </ScrollView>
