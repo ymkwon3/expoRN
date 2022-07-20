@@ -51,7 +51,9 @@ export default function Weather() {
     setDays(json.daily);
   };
   useEffect(() => {
-    getWeather();
+    (async function init() {
+      await getWeather();
+    })()
   }, []);
 
   return (

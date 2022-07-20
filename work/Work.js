@@ -12,14 +12,11 @@ import { theme } from "../color";
 import { getData, storeData } from "../Storage";
 import { Fontisto } from "@expo/vector-icons";
 
-const STORAGE_KEY = "@todos";
+const TODO_KEY = "@todos";
 
 export default function Work() {
-  const [working, setWorking] = useState(true);
   const [text, setText] = useState("");
   const [toDos, setToDos] = useState({});
-  const travel = () => setWorking(false);
-  const work = () => setWorking(true);
   const onChangeText = payload => setText(payload);
 
   const addToDo = async () => {
@@ -27,9 +24,9 @@ export default function Work() {
       return;
     }
 
-    const newToDos = { ...toDos, [Date.now()]: { text, working } };
+    const newToDos = { ...toDos, [Date.now()]: { text } };
     setToDos(newToDos);
-    await storeData(STORAGE_KEY, newToDos);
+    await storeData(TODO_KEY, newToDos);
     setText("");
   };
 
@@ -43,7 +40,7 @@ export default function Work() {
           text: "sure", onPress: async () => {
             const newToDos = { ...toDos };
             delete newToDos[key];
-            await storeData(STORAGE_KEY, newToDos);
+            await storeData(TODO_KEY, newToDos);
             setToDos(newToDos)
           }
         }
@@ -52,53 +49,39 @@ export default function Work() {
 
   useEffect(() => {
     const init = async () => {
-      const data = await getData(STORAGE_KEY);
+      const data = await getData(TODO_KEY);
       setToDos(data);
     }
     init();
   }, [])
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity>
-          <Text
-            style={{ ...styles.btnText, color: working ? "white" : theme.grey }}
-            onPress={work}
-          >
-            Work
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Text
-            style={{
-              ...styles.btnText,
-              color: !working ? "white" : theme.grey,
-            }}
-            onPress={travel}
-          >
-            Study
-          </Text>
-        </TouchableOpacity>
-      </View>
-
+    <View>
       <TextInput
         onSubmitEditing={addToDo}
         value={text}
         onChangeText={onChangeText}
         returnKeyType={"done"}
-        placeholder={working ? "Add a ToDo" : "Where do you want to go"}
+        placeholder={"Add a ToDo"}
         style={styles.input}
       ></TextInput>
       <ScrollView>
         {Object.keys(toDos).map(key => (
-          toDos[key].working === working ?
-            <View key={key} style={styles.toDo}>
-              <Text style={styles.toDoText}>{toDos[key].text}</Text>
-              <TouchableOpacity onPress={() => deleteToDo(key)}>
-                <Fontisto name="trash" size={18} color={theme.grey}></Fontisto>
+          <View key={key} style={styles.toDo}>
+            <Text style={styles.toDoText}>{toDos[key].text}</Text>
+            <View style={styles.btnContainer}>
+              <TouchableOpacity onPress={() => console.log("check click")}>
+                <Fontisto name="check" size={20} color={theme.grey} style={styles.btn}></Fontisto>
               </TouchableOpacity>
-            </View> : null
+              <TouchableOpacity onPress={() => console.log("check click")}>
+                <Fontisto name="file-1" size={20} color={theme.grey} style={styles.btn}></Fontisto>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => deleteToDo(key)}>
+                <Fontisto name="trash" size={20} color={theme.grey} style={styles.btn}></Fontisto>
+              </TouchableOpacity>
+            </View>
+
+          </View>
         ))}
       </ScrollView>
     </View>
@@ -106,20 +89,6 @@ export default function Work() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 20,
-    backgroundColor: theme.bg,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 100,
-  },
-  btnText: {
-    fontSize: 38,
-    fontWeight: "600",
-  },
   input: {
     backgroundColor: "#fff",
     paddingVertical: 15,
@@ -143,4 +112,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "500",
   },
+  btn: {
+    marginHorizontal: 10,
+  },
+  btnContainer: {
+    flexDirection: "row",
+  },
 });
+
+// checkbox-active, checkbox-passive
