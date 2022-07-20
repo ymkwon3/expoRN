@@ -4,4 +4,4 @@ const theme = {
   toDoBg: '#5C5C60'
 };
 
-export {theme}
+export { theme }

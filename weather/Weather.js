@@ -38,12 +38,12 @@ export default function Weather() {
       coords: { latitude, longitude },
     } = await Location.getCurrentPositionAsync({ accuracy: 5 });
     const {
-      [0]: { country, region, city },
+      [0]: { country, region },
     } = await Location.reverseGeocodeAsync(
       { latitude, longitude },
       { useGoogleMaps: false }
     );
-    setCity(`${country} ${region} ${city}`);
+    setCity(`${country} ${region}`);
     const response = await fetch(
       `https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&exclude=alerts&appid=${WEATHER_APIKEY}&units=metric`
     );

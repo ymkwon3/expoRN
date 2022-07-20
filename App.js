@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import {
- StyleSheet, View,
+  StyleSheet, View,
 } from "react-native";
 import Weather from "./weather/Weather";
 import Work from "./work/Work";
@@ -9,11 +9,11 @@ import Work from "./work/Work";
 
 export default function App() {
   return (
-   <View style={styles.container}>
+    <View style={styles.container}>
       {/* <Weather></Weather> */}
       <Work></Work>
       <StatusBar style="light"></StatusBar>
-   </View>
+    </View>
   );
 }
 

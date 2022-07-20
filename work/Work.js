@@ -1,14 +1,18 @@
-import react, { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
   TouchableOpacity,
-  TouchableHighlight,
   TextInput,
   ScrollView,
+  Alert,
 } from "react-native";
 import { theme } from "../color";
+import { getData, storeData } from "../Storage";
+import { Fontisto } from "@expo/vector-icons";
+
+const STORAGE_KEY = "@todos";
 
 export default function Work() {
   const [working, setWorking] = useState(true);
@@ -17,17 +21,43 @@ export default function Work() {
   const travel = () => setWorking(false);
   const work = () => setWorking(true);
   const onChangeText = payload => setText(payload);
-  console.log("123213");
-  const addToDo = () => {
+
+  const addToDo = async () => {
     if (text === "") {
       return;
     }
 
-    const newToDos = { ...toDos, [Date.now()]: { text, work: working } };
+    const newToDos = { ...toDos, [Date.now()]: { text, working } };
     setToDos(newToDos);
+    await storeData(STORAGE_KEY, newToDos);
     setText("");
   };
-  console.log(toDos);
+
+  const deleteToDo = (key) => {
+    Alert.alert(
+      "Delete ToDo",
+      "Are you sure?",
+      [
+        { text: "cancel" },
+        {
+          text: "sure", onPress: async () => {
+            const newToDos = { ...toDos };
+            delete newToDos[key];
+            await storeData(STORAGE_KEY, newToDos);
+            setToDos(newToDos)
+          }
+        }
+      ])
+  }
+
+  useEffect(() => {
+    const init = async () => {
+      const data = await getData(STORAGE_KEY);
+      setToDos(data);
+    }
+    init();
+  }, [])
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -62,9 +92,13 @@ export default function Work() {
       ></TextInput>
       <ScrollView>
         {Object.keys(toDos).map(key => (
-          <View key={key} style={styles.toDo}>
-            <Text style={styles.toDoText}>{toDos[key].text}</Text>
-          </View>
+          toDos[key].working === working ?
+            <View key={key} style={styles.toDo}>
+              <Text style={styles.toDoText}>{toDos[key].text}</Text>
+              <TouchableOpacity onPress={() => deleteToDo(key)}>
+                <Fontisto name="trash" size={18} color={theme.grey}></Fontisto>
+              </TouchableOpacity>
+            </View> : null
         ))}
       </ScrollView>
     </View>
@@ -100,6 +134,9 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 20,
     borderRadius: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   toDoText: {
     color: "white",
