@@ -1,69 +1,86 @@
-import react, { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
   TouchableOpacity,
-  TouchableHighlight,
   TextInput,
   ScrollView,
+  Alert,
 } from "react-native";
 import { theme } from "../color";
+import { getData, storeData } from "../Storage";
+import { Fontisto } from "@expo/vector-icons";
+
+const TODO_KEY = "@todos";
 
 export default function Work() {
-  const [working, setWorking] = useState(true);
   const [text, setText] = useState("");
   const [toDos, setToDos] = useState({});
-  const travel = () => setWorking(false);
-  const work = () => setWorking(true);
   const onChangeText = payload => setText(payload);
-  console.log("123213");
-  const addToDo = () => {
+
+  const addToDo = async () => {
     if (text === "") {
       return;
     }
 
-    const newToDos = { ...toDos, [Date.now()]: { text, work: working } };
+    const newToDos = { ...toDos, [Date.now()]: { text } };
     setToDos(newToDos);
+    await storeData(TODO_KEY, newToDos);
     setText("");
   };
-  console.log(toDos);
-  return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity>
-          <Text
-            style={{ ...styles.btnText, color: working ? "white" : theme.grey }}
-            onPress={work}
-          >
-            Work
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Text
-            style={{
-              ...styles.btnText,
-              color: !working ? "white" : theme.grey,
-            }}
-            onPress={travel}
-          >
-            Study
-          </Text>
-        </TouchableOpacity>
-      </View>
 
+  const deleteToDo = (key) => {
+    Alert.alert(
+      "Delete ToDo",
+      "Are you sure?",
+      [
+        { text: "cancel" },
+        {
+          text: "sure", onPress: async () => {
+            const newToDos = { ...toDos };
+            delete newToDos[key];
+            await storeData(TODO_KEY, newToDos);
+            setToDos(newToDos)
+          }
+        }
+      ])
+  }
+
+  useEffect(() => {
+    const init = async () => {
+      const data = await getData(TODO_KEY);
+      setToDos(data);
+    }
+    init();
+  }, [])
+
+  return (
+    <View>
       <TextInput
         onSubmitEditing={addToDo}
         value={text}
         onChangeText={onChangeText}
         returnKeyType={"done"}
-        placeholder={working ? "Add a ToDo" : "Where do you want to go"}
+        placeholder={"Add a ToDo"}
         style={styles.input}
       ></TextInput>
       <ScrollView>
         {Object.keys(toDos).map(key => (
           <View key={key} style={styles.toDo}>
             <Text style={styles.toDoText}>{toDos[key].text}</Text>
+            <View style={styles.btnContainer}>
+              <TouchableOpacity onPress={() => console.log("check click")}>
+                <Fontisto name="check" size={20} color={theme.grey} style={styles.btn}></Fontisto>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => console.log("check click")}>
+                <Fontisto name="file-1" size={20} color={theme.grey} style={styles.btn}></Fontisto>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => deleteToDo(key)}>
+                <Fontisto name="trash" size={20} color={theme.grey} style={styles.btn}></Fontisto>
+              </TouchableOpacity>
+            </View>
+
           </View>
         ))}
       </ScrollView>
@@ -72,20 +89,6 @@ export default function Work() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 20,
-    backgroundColor: theme.bg,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 100,
-  },
-  btnText: {
-    fontSize: 38,
-    fontWeight: "600",
-  },
   input: {
     backgroundColor: "#fff",
     paddingVertical: 15,
@@ -100,10 +103,21 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 20,
     borderRadius: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   toDoText: {
     color: "white",
     fontSize: 16,
     fontWeight: "500",
   },
+  btn: {
+    marginHorizontal: 10,
+  },
+  btnContainer: {
+    flexDirection: "row",
+  },
 });
+
+// checkbox-active, checkbox-passive
