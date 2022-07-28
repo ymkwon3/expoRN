@@ -12,3 +12,5 @@ web-build/
 .file.js
 # macOS
 .DS_Store
+
+file.js
